@@ -5,6 +5,7 @@ import com.example.springwebflux.mappers.ItemAndItemDTO;
 import com.example.springwebflux.models.Item;
 import com.example.springwebflux.repositories.ItemRepository;
 import com.example.springwebflux.services.ItemService;
+import com.example.springwebflux.services.exceptions.ItemEmptyAnyField;
 import com.example.springwebflux.services.exceptions.ItemNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Mono<Item> save(ItemDTO itemDTO) {
-    return itemRepository.save(itemAndItemDTO.itemDTOToItem(itemDTO));
+        return Mono.just(itemDTO).flatMap((adquiredItem) -> {
+            if (adquiredItem.description().isEmpty()|| adquiredItem.price() == null ) {
+                return Mono.error(new ItemEmptyAnyField("Despcription is empty"));
+            }
+            if (adquiredItem.price() < 0 || adquiredItem.price() == null) {
+               return  Mono.error(new ItemEmptyAnyField("Price is empty"));
+            }
+            if (adquiredItem.title().isEmpty() || adquiredItem.price() == null) {
+                return Mono.error(new ItemEmptyAnyField("Title is empty"));
+            }
+            return itemRepository.save(itemAndItemDTO.itemDTOToItem(adquiredItem));
+        });
     }
 
     @Override
@@ -39,7 +51,9 @@ public class ItemServiceImpl implements ItemService {
     public Mono<Item> update(Item item) {
         return getById(item.getId()).flatMap((existedItem)->{
             existedItem.setTitle(item.getTitle());
-            return itemRepository.save(item);
+            existedItem.setPrice(item.getPrice());
+            existedItem.setDescription(item.getDescription());
+            return itemRepository.save(existedItem);
         });
     }
 
