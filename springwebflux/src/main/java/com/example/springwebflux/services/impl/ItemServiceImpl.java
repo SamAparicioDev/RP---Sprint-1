@@ -50,8 +50,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Mono<Item> update(Item item) {
-        return getById(item.getId()).flatMap((existedItem)->{
+    public Mono<Item> update(Long id,Item item) {
+        return getById(id).flatMap((existedItem)->{
             existedItem.setTitle(item.getTitle());
             existedItem.setPrice(item.getPrice());
             existedItem.setDescription(item.getDescription());

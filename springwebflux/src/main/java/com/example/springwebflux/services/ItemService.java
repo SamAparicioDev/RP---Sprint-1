@@ -9,6 +9,6 @@ public interface ItemService {
     Mono<Item> save(ItemDTO item);
     Mono<Item> getById(Long id);
     Flux<Item> getAll();
-    Mono<Item> update(Item item);
+    Mono<Item> update(Long id,Item item);
     Mono<Void> deleteById(Long id);
 }

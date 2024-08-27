@@ -31,8 +31,8 @@ public class ItemController{
     }
     @PutMapping("/{id}")
     @Transactional
-    public Mono<Item> updateItemById(@RequestBody Item item){
-        return itemServiceImpl.update(item);
+    public Mono<Item> updateItemById(@PathVariable Long id,@RequestBody Item item){
+        return itemServiceImpl.update(id,item);
     }
     @PostMapping
     public Mono<Item> addItem(@RequestBody ItemDTO item){
