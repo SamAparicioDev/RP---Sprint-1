@@ -9,6 +9,7 @@ import com.example.springwebflux.services.exceptions.ItemEmptyAnyField;
 import com.example.springwebflux.services.exceptions.ItemNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
+    @Transactional
     public Mono<Item> save(ItemDTO itemDTO) {
         return Mono.just(itemDTO).flatMap((adquiredItem) -> {
             if (adquiredItem.description().isEmpty()|| adquiredItem.price() == null ) {
@@ -57,12 +59,13 @@ public class ItemServiceImpl implements ItemService {
         });
     }
 
+
     @Override
     public Mono<Void> deleteById(Long id) {
-      return  itemRepository.deleteById(id).doOnSuccess(
-                itemFound -> System.out.println("Item deleted successfully")
-        ).doOnError(
-               error -> new ItemNotFoundException("Item with id: " + id + " not found")
+       Mono<Void> operationToDelete = itemRepository.deleteById(id).doOnError(
+                error -> new ItemNotFoundException("Item with id: " + id + " not found")
         );
+       operationToDelete.subscribe();
+       return Mono.just(operationToDelete).then();
     }
 }
