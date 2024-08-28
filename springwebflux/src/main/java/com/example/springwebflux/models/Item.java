@@ -6,14 +6,12 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("item")
 @ToString
+@Getter
 public class Item {
     @Id
-    @Getter
     private Long id;
-    @Getter
     @Setter
     private String title, description;
-    @Getter
     @Setter
     private Double price;
     public Item() {
